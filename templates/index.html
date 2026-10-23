@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoGuard - Used Car Inspector</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        .header { text-align: center; padding: 30px 0; }
+        .header h1 { font-size: 2.2rem; color: #38bdf8; }
+        .header p { color: #94a3b8; margin-top: 8px; }
+        .card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+        label { display: block; margin: 14px 0 6px; font-weight: 600; }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #38bdf8;
+            color: #0f172a;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button:hover { background: #0ea5e9; }
+        .verdict {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .verdict h2 { font-size: 2rem; }
+        .green { background: #064e3b; color: #6ee7b7; }
+        .orange { background: #78350f; color: #fcd34d; }
+        .red { background: #7f1d1d; color: #fca5a5; }
+        .finding {
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #334155;
+            background: #0f172a;
+        }
+        .finding.ok { border-left-color: #10b981; }
+        .finding.uyari { border-left-color: #f59e0b; }
+        .finding.tehlike { border-left-color: #ef4444; }
+        .finding strong { display: block; margin-bottom: 4px; }
+        .finding span { color: #94a3b8; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+                <div class="header">
+            <h1>🚗 AutoGuard</h1>
+            <p>Yapay Zeka Destekli İkinci El Araç Dolandırıcılık Dedektifi</p>
+            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px;">
+                <span style="background:#1e293b; color:#38bdf8; padding:6px 12px; border-radius:20px; font-size:0.85rem;">🔍 Geri Çağırma Kontrolü</span>
+                <span style="background:#1e293b; color:#38bdf8; padding:6px 12px; border-radius:20px; font-size:0.85rem;">💰 Fiyat Analizi</span>
+                <span style="background:#1e293b; color:#38bdf8; padding:6px 12px; border-radius:20px; font-size:0.85rem;">🎣 Sazan Sarmalı Tespiti</span>
+                <span style="background:#1e293b; color:#38bdf8; padding:6px 12px; border-radius:20px; font-size:0.85rem;">🤖 Nemotron AI</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <form action="/analyze" method="post">
+                                <div style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap;">
+                    <button type="button" onclick="ornekDoldur('temiz')" style="width:auto; margin:0; padding:8px 14px; font-size:0.9rem; background:#10b981;">✅ Temiz Araç</button>
+                    <button type="button" onclick="ornekDoldur('sazan')" style="width:auto; margin:0; padding:8px 14px; font-size:0.9rem; background:#ef4444;">🎣 Sazan Sarmalı</button>
+                    <button type="button" onclick="ornekDoldur('riskli')" style="width:auto; margin:0; padding:8px 14px; font-size:0.9rem; background:#f59e0b;">⚠️ Şüpheli İlan</button>
+                </div>
+                <label>Araç Modeli (örn: Corolla, Focus, Clio)</label>
+                <input type="text" name="model" required placeholder="Corolla">
+
+                <label>Model Yılı</label>
+                <input type="number" name="year" required placeholder="2015">
+
+                <label>İlan Fiyatı (TL)</label>
+                <input type="number" name="price" required placeholder="400000">
+
+                <label>İlan Açıklaması</label>
+                <textarea name="description" rows="4" placeholder="İlan metnini buraya yapıştırın..."></textarea>
+                                <label>Satıcı Telefonu</label>
+                <input type="text" name="telefon" placeholder="0555 987 6543">
+
+                <label>Fotoğraf Kimliği (demo için)</label>
+                <input type="text" name="foto_id" placeholder="foto_X">
+
+                    <button type="submit" id="analizBtn">Analiz Et</button>
+            </form>
+        </div>
+
+        {% if result %}
+        <div class="verdict {{ result.verdict_color }}">
+            <h2>{{ result.verdict }}</h2>
+            <p>Risk Puanı: {{ result.risk_score }}/100</p>
+        </div>
+
+                <div class="card">
+            <h3 style="margin-bottom:16px;">📋 Analiz Sonuçları</h3>
+            {% for f in result.findings %}
+            <div class="finding {{ f.type }}">
+                <strong>{{ f.title }}</strong>
+                <span>{{ f.detail }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if result.ai_comment %}
+        <div class="card">
+            <h3 style="margin-bottom:16px;">🤖 Yapay Zeka Değerlendirmesi (Nemotron)</h3>
+            <p style="line-height:1.7; white-space:pre-wrap; color:#cbd5e1;">{{ result.ai_comment }}</p>
+        </div>
+        {% endif %}
+                {% if result.sazan and result.sazan.riskli %}
+        <div class="card" style="border:2px solid #ef4444;">
+            <h3 style="margin-bottom:16px;">🎣 Sazan Sarmalı Kontrolü</h3>
+            <div class="finding tehlike">
+                <strong>⚠️ Yüksek Risk</strong>
+                <span>{{ result.sazan.uyari }}</span>
+            </div>
+            <p style="margin:14px 0 8px; color:#94a3b8;">Bu araca ait tespit edilen ilanlar:</p>
+            {% for e in result.sazan.eslesmeler %}
+            <div class="finding" style="border-left-color:#f59e0b;">
+                <strong>{{ e.ilan.site }} — {{ e.ilan.satici }}</strong>
+                <span>{{ e.ilan.model }} {{ e.ilan.year }} • {{ "{:,}".format(e.ilan.price) }} TL • Tel: {{ e.ilan.telefon }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+        <script>
+        function ornekDoldur(tip) {
+            const f = document.forms[0];
+            if (tip === 'temiz') {
+                f.model.value = 'Clio';
+                f.year.value = '2018';
+                f.price.value = '470000';
+                f.description.value = 'tek elden hatasiz boyasiz';
+                f.telefon.value = '0541 222 3344';
+                f.foto_id.value = 'foto_B';
+            } else if (tip === 'sazan') {
+                f.model.value = 'Golf';
+                f.year.value = '2019';
+                f.price.value = '540000';
+                f.description.value = '2019 Golf hayalet cam tavan servis bakimli acil kapora ile';
+                f.telefon.value = '0555 987 6543';
+                f.foto_id.value = 'foto_X';
+            } else if (tip === 'riskli') {
+                f.model.value = 'Corolla';
+                f.year.value = '2015';
+                f.price.value = '300000';
+                f.description.value = 'acil satilik sahibi yurt disinda kapora gonderin';
+                f.telefon.value = '0532 111 2233';
+                f.foto_id.value = 'foto_A';
+            }
+        }
+                // Analiz Et'e basinca butonu "analiz ediliyor" yap
+        document.forms[0].addEventListener('submit', function() {
+            const btn = document.getElementById('analizBtn');
+            btn.textContent = '⏳ Analiz ediliyor, lütfen bekleyin...';
+            btn.disabled = true;
+        });
+    </script>
+</body>
+</html>
