@@ -188,15 +188,15 @@ def analyze_car(model: str, year: int, price: int, description: str):
         })
         risk_score += 35
 
-    # Sonuc karari
+        # Sonuc karari
     if risk_score >= 50:
-        verdict = "ALMA"
+        verdict = "ALMA / DON'T BUY"
         verdict_color = "red"
     elif risk_score >= 20:
-        verdict = "DIKKATLI OL"
+        verdict = "DIKKATLI OL / CAUTION"
         verdict_color = "orange"
     else:
-        verdict = "ALINABILIR"
+        verdict = "ALINABILIR / SAFE TO BUY"
         verdict_color = "green"
 
     return {
@@ -230,7 +230,7 @@ def analyze(
     result["sazan"] = sazan_sarmasi_kontrol(model, year, telefon, foto_id, description)
     # Sazan sarmali yakalandiysa genel karari ALMA yap
     if result["sazan"]["riskli"]:
-        result["verdict"] = "ALMA"
+        result["verdict"] = "ALMA / DON'T BUY"
         result["verdict_color"] = "red"
         result["risk_score"] = 100
     return templates.TemplateResponse(request, "index.html", {"result": result})

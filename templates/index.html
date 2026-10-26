@@ -78,7 +78,7 @@
             <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px;">
                 <span style="background:#1e293b; color:#38bdf8; padding:6px 12px; border-radius:20px; font-size:0.85rem;">🔍 Geri Çağırma Kontrolü</span>
                 <span style="background:#1e293b; color:#38bdf8; padding:6px 12px; border-radius:20px; font-size:0.85rem;">💰 Fiyat Analizi</span>
-                <span style="background:#1e293b; color:#38bdf8; padding:6px 12px; border-radius:20px; font-size:0.85rem;">🎣 Sazan Sarmalı Tespiti</span>
+                                <span style="background:#1e293b; color:#38bdf8; padding:6px 12px; border-radius:20px; font-size:0.85rem;">🎣 Scam Listing Detection</span>
                 <span style="background:#1e293b; color:#38bdf8; padding:6px 12px; border-radius:20px; font-size:0.85rem;">🤖 Nemotron AI</span>
             </div>
         </div>
@@ -135,9 +135,9 @@
         {% endif %}
                 {% if result.sazan and result.sazan.riskli %}
         <div class="card" style="border:2px solid #ef4444;">
-            <h3 style="margin-bottom:16px;">🎣 Sazan Sarmalı Kontrolü</h3>
+            <h3 style="margin-bottom:16px;">🎣 Sazan Sarmalı / Fake Listing Scam</h3>
             <div class="finding tehlike">
-                <strong>⚠️ Yüksek Risk</strong>
+                <strong>⚠️ Yüksek Risk / High Risk</strong>
                 <span>{{ result.sazan.uyari }}</span>
             </div>
             <p style="margin:14px 0 8px; color:#94a3b8;">Bu araca ait tespit edilen ilanlar:</p>
